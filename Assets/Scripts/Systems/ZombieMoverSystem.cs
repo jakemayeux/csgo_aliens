@@ -76,7 +76,7 @@ partial struct ZombieMoverJob : IJobEntity
 
     public void Execute(Entity entity, in ZombieMover mover, ref LocalTransform transform)
     {
-        float3 destination = humanLocations[0];
+        float3 destination = GetClosestLocation(transform.Position, humanLocations);
         float3 currentPosition = transform.Position;
 
         float3 trajectory = math.normalize(destination - currentPosition);
@@ -87,6 +87,23 @@ partial struct ZombieMoverJob : IJobEntity
 
     }
 
+    public float3 GetClosestLocation(float3 myPosition, NativeList<float3> locations)
+    {
+        float3 closestLocation = float3.zero;
 
+        float minDistance = math.INFINITY;
+
+        foreach(float3 location in locations)
+        {
+            float distance = math.distancesq(myPosition, location);
+            if(distance < minDistance)
+            {
+                closestLocation = location;
+                minDistance = distance;
+            }
+        }
+
+        return closestLocation;
+    }
 
 }
