@@ -16,16 +16,17 @@ partial struct ZombieMoverSystem : ISystem
     {
         foreach(var (mover, transform, entity) in SystemAPI.Query<RefRW<ZombieMover>, RefRW<LocalTransform>>().WithEntityAccess())
         {
-            Entity zombie = entity;
+            
             //Calculate next position 
             float3 destination = mover.ValueRO.destination;
             float3 currentPosition = transform.ValueRO.Position;
             
             float3 trajectory = math.normalize(destination - currentPosition);
             
-            float3 nextPosition = trajectory* mover.ValueRO.speed * SystemAPI.Time.DeltaTime;
+            float3 nextPosition = currentPosition + trajectory* mover.ValueRO.speed * SystemAPI.Time.DeltaTime;
             
             transform.ValueRW.Position = nextPosition;
+            
         }
     }
 }
