@@ -26,6 +26,10 @@ partial struct ZombieSpawningSystem : ISystem
         {
             nextSpawn = CurrentTime + 1;
         }
+        else
+        {
+            return;
+        }
 
         foreach (var (spawner, entity) in SystemAPI.Query<RefRW<ZombieSpawner>>().WithEntityAccess())
         {
