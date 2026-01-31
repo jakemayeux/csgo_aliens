@@ -119,7 +119,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8491188372059851720}
-  - component: {fileID: 4045694904811937790}
+  - component: {fileID: -6716631710540921090}
   m_Layer: 0
   m_Name: Human Prefab
   m_TagString: Untagged
@@ -143,7 +143,7 @@ Transform:
   - {fileID: 9086708695066073848}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4045694904811937790
+--- !u!114 &-6716631710540921090
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4586607894779349738}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebcfc402216a80745b4abceb5df6a8dc, type: 3}
+  m_Script: {fileID: 11500000, guid: fe7f49b496616f14cae9313d9922f852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0
+  speed: 1

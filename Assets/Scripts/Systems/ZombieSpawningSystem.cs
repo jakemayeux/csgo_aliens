@@ -10,10 +10,11 @@ partial struct ZombieSpawningSystem : ISystem
 
     double nextSpawn;
     Random random;
-    
+
 
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<ZombieSpawner>();
         random = new Random((uint)UnityEngine.Random.Range(1, int.MaxValue));
     }
 
