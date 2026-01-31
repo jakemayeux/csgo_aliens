@@ -22,7 +22,7 @@ partial struct ZombieSpawningSystem : ISystem
         double CurrentTime = SystemAPI.Time.ElapsedTime;
 
 
-        if (CurrentTime < nextSpawn)
+        if (nextSpawn < CurrentTime)
         {
             nextSpawn = CurrentTime + 1;
         }
