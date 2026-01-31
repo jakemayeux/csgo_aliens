@@ -20,6 +20,7 @@ partial struct GameManagerSystem : ISystem
         autoTransitions[(int)GameManagerStates.Starting] =  (int)GameManagerStates.SpawningInitialZombies;
 
         autoTransitions[(int)GameManagerStates.SpawningInitialZombies] =  (int)GameManagerStates.SpawningInitialHumans;
+        autoTransitions[(int)GameManagerStates.SpawningInitialHumans] =  (int)GameManagerStates.Playing;
 
 
         if (autoTransitions.ContainsKey((int)gameManager.ValueRO.GameManagerStates))

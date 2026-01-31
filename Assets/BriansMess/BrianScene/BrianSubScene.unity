@@ -210,6 +210,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1711173007}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &709781016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 709781018}
+  - component: {fileID: 709781017}
+  m_Layer: 0
+  m_Name: ZombieSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &709781017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709781016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ba38748512b0024a8a3d33a752bf1c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  X: 0
+  Z: 0
+  Center:
+    x: 0
+    y: 0
+    z: 0
+  Prefab: {fileID: 4586607894779349738, guid: 465510aa6b665ad4da4e5a03ac033c65, type: 3}
+--- !u!4 &709781018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 709781016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.529912, y: -1.6054697, z: -11.75704}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &847465047
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,3 +535,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 408395245}
   - {fileID: 1451827866}
+  - {fileID: 709781018}
