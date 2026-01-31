@@ -20,6 +20,12 @@ partial struct ZombieSpawningSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        RefRW<GameManager> gameManager = SystemAPI.GetSingletonRW<GameManager>();
+        /*if(gameManager.ValueRO.GameManagerStates != GameManagerStates.SpawningInitialZombies)
+        {
+            return;
+        }*/
+
         double CurrentTime = SystemAPI.Time.ElapsedTime;
 
 

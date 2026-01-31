@@ -1,9 +1,11 @@
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class HumanAuthoring : MonoBehaviour
 {
-    public float speed;
+    public float Speed;
+    public float3 Destination;
 
     class Baker: Baker<HumanAuthoring>
     {
@@ -12,7 +14,8 @@ public class HumanAuthoring : MonoBehaviour
             Entity entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent(entity, new HumanMover
             {
-                speed = authoring.speed
+                speed = authoring.Speed,
+                destination = authoring.Destination
             });
         }
     }
