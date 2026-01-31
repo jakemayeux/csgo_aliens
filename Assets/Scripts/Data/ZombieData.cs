@@ -6,8 +6,6 @@ public struct ZombieMover : IComponentData
 {
     public float speed;
     public float3 destination;
-
-    
 }
 
 public struct ZombieSpawner : IComponentData
