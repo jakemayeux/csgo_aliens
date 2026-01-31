@@ -9,8 +9,8 @@ partial struct ZombieSpawningSystem : ISystem
 {
 
     double nextSpawn;
-
     Random random;
+    
 
     public void OnCreate(ref SystemState state)
     {

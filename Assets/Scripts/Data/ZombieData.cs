@@ -7,7 +7,7 @@ public struct ZombieMover : IComponentData
     public float speed;
     public float3 destination;
 
-
+    
 }
 
 public struct ZombieSpawner : IComponentData
@@ -15,7 +15,10 @@ public struct ZombieSpawner : IComponentData
     public Rectangle SpawnZone;
     public Entity Prefab;
 }
-
+public struct ZombieTag: IComponentData
+{
+    //Empty, just to find zombies
+}
 public struct Rectangle
 {
     public float X;
