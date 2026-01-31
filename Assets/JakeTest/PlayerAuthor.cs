@@ -55,6 +55,8 @@ partial struct PlayerJob : IJobEntity
 
     public void Execute(Entity entity, in PlayerData playerData, ref LocalTransform transform)
     {
+        Forward.y = 0f;
+        Forward.Normalize();
         float3 move_direction = Right * InputX + Forward * InputZ;
 
         transform.Position += DeltaTime * move_direction * 100;
