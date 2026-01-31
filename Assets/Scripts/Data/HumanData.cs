@@ -14,7 +14,12 @@ public struct HumanSpawner : IComponentData
     public Rectangle SpawnZone;
     public Entity Prefab;
 
+}
 
+public struct HumanReference
+{
+    public Entity Entity;
+    public float3 Position;
 }
 
 

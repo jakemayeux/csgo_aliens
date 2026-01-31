@@ -29,6 +29,7 @@ partial struct HumanMoverSystem : ISystem
 }
 
 [BurstCompile]
+[WithAbsent(typeof(ZombieTag))]
 partial struct HumanMoverJob : IJobEntity
 {
     [ReadOnly] public float DeltaTime;

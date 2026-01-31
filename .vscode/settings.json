@@ -66,5 +66,5 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj"
     },
-    "dotnet.defaultSolution": "csgo_aliens.sln"
+    "dotnet.defaultSolution": "GGJ 2026 ECS.sln"
 }
