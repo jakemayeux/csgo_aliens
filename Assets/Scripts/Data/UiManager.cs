@@ -4,7 +4,7 @@ using System;
 
 public class UiManager : MonoBehaviour
 {
-
+    public GameObject humanUi;
     public GameObject zombieUi;
 
     public static event EventHandler zombieTime;
@@ -18,6 +18,7 @@ public class UiManager : MonoBehaviour
     public void Awake()
     {
         zombieUi.SetActive(false);
+        humanUi.SetActive(true);
 
         zombieTime += ExecuteZombieTime;
     }
@@ -25,6 +26,7 @@ public class UiManager : MonoBehaviour
     private void ExecuteZombieTime(object sender, EventArgs e)
     {
         zombieUi.SetActive(true);
+        humanUi.SetActive(false);
     }
 
 }
