@@ -6,9 +6,11 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEditor.XR;
 using System.Linq;
+using Unity.Jobs;
 
 partial struct ZombieMoverSystem : ISystem
 {
+    bool somethingHappened;
     int parity;
     public NativeParallelMultiHashMap<int, float3> spatialMap1;
     public NativeParallelMultiHashMap<int, float3> spatialMap2;
@@ -72,6 +74,15 @@ partial struct ZombieMoverSystem : ISystem
 
         spatialMapNew.Clear();
 
+        Entity playerEntity = SystemAPI.GetSingletonEntity<PlayerData>();
+
+        if (!somethingHappened && SystemAPI.HasComponent<ZombieTag>(playerEntity))
+        {
+            somethingHappened = true;
+            UiManager.DoSomethingStupid();
+            
+        }
+
         ZombieMoverJob moverJob = new ZombieMoverJob
         {
             DeltaTime = SystemAPI.Time.DeltaTime,
@@ -81,7 +92,8 @@ partial struct ZombieMoverSystem : ISystem
             spatialMapWrite = spatialMapNew.AsParallelWriter(),
             ECB = ECB.AsParallelWriter()
         };
-        state.Dependency = moverJob.ScheduleParallel(state.Dependency);
+        state.Dependency =  moverJob.ScheduleParallel(state.Dependency);
+        //print hello
     }
 }
 
@@ -97,7 +109,7 @@ public struct DeathComponent : IComponentData
 partial struct ZombieMoverJob : IJobEntity
 {
     [ReadOnly] public float DeltaTime;
- 
+    
     [ReadOnly] public NativeList<HumanReference> humanReferences;   
     [ReadOnly] public float3 target;
     [ReadOnly]  public NativeParallelMultiHashMap<int, float3> spatialMapRead;
@@ -148,9 +160,9 @@ partial struct ZombieMoverJob : IJobEntity
 
         if(math.distancesq(transform.Position, GetClosestHuman(transform.Position, humanReferences).Position) <= 0.5f)
         {
-           UnityEngine.Debug.Log("Zombie touched meeeee!");
-           //touchedHuman = true;
-           ECB.AddComponent<ZombieTag>(entity.Index, GetClosestHuman(transform.Position, humanReferences).Entity); 
+           touchedHuman = true;
+
+           ECB.AddComponent<ZombieTag>(entity.Index, GetClosestHuman(transform.Position, humanReferences).Entity);
         }
 
     }
