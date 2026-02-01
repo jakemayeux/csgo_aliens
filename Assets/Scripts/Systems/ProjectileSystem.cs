@@ -53,7 +53,8 @@ partial struct ProjectileJob : IJobEntity
         foreach(ZombieReference zombieReference in zombieReferences)
         {
             float distance = math.distancesq(transform.Position, zombieReference.Position);
-            if(distance <= 0.5f && distance > 0f)
+
+            if(distance <= 2f)
             {
                 UnityEngine.Debug.Log("Hit Zombie");
             }
