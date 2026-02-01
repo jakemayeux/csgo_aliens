@@ -40,7 +40,6 @@ partial struct ZombieMoverSystem : ISystem
                 Position = localTransform.ValueRO.Position
             };
 
-
             humans.Add(reference);
 
         }

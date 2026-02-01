@@ -17,6 +17,12 @@ public struct ZombieTag: IComponentData
 {
     //Empty, just to find zombies
 }
+
+public struct Stunned: IComponentData
+{
+    
+}
+
 public struct Rectangle
 {
     public float X;
