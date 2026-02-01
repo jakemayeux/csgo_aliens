@@ -30,5 +30,6 @@ public enum GameManagerStates
     Playing = 10,
     Paused = 20,
     SpawningInitialHumans = 30,
-    SpawningInitialZombies = 40
+    SpawningInitialZombies = 40,
+    GameOver = 50
 }

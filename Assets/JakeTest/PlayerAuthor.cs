@@ -7,26 +7,45 @@ using UnityEngine;
 
 partial struct PlayerSystem : ISystem
 {
-    public void OnCreate(ref SystemState state) {}
+    public void OnCreate(ref SystemState state) { }
 
-    public void OnUpdate(ref SystemState state) {
+    public void OnUpdate(ref SystemState state)
+    {
         PlayerJob job = new PlayerJob
         {
+            zombieLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
             DeltaTime = SystemAPI.Time.DeltaTime,
             InputX = Input.GetAxis("Horizontal"),
             InputZ = Input.GetAxis("Vertical"),
             Forward = Camera.main.transform.forward,
-            Right = Camera.main.transform.right
+            Right = Camera.main.transform.right,
+            speed = 50f,
+            zombieSpeedMultiplier = 1.5f,
+
+            //Weapons
+            WeaponInput = Input.GetMouseButtonDown(0)
         };
+
+
 
         state.Dependency = job.ScheduleParallel(state.Dependency);
     }
 }
 
-public class PlayerAuthor : MonoBehaviour 
+public class PlayerAuthor : MonoBehaviour
 {
     public GameObject Prefab;
-    class Baker: Baker<PlayerAuthor>
+
+    public float Speed = 100f;
+
+    [Header("Weapon References")]
+    public Transform WeaponLocation;
+    public GameObject WeaponPrefab;
+    public GameObject ProjectilePrefab;
+    public float ProjectileSpeed = 100f;
+    public float StunDuration = 3.0f;
+
+    class Baker : Baker<PlayerAuthor>
     {
         public override void Bake(PlayerAuthor author)
         {
@@ -34,6 +53,17 @@ public class PlayerAuthor : MonoBehaviour
             AddComponent(entity, new PlayerData
             {
                 Prefab = GetEntity(author.Prefab, TransformUsageFlags.Dynamic),
+            });
+
+            AddComponent(entity, new HumanTag { });
+
+            AddComponent(entity, new WeaponData
+            {
+                speed = author.ProjectileSpeed,
+                projectilePrefab = GetEntity(author.ProjectilePrefab, TransformUsageFlags.Dynamic),
+                launchLocation = GetEntity(author.WeaponLocation, TransformUsageFlags.Dynamic),
+                weaponPrefab = GetEntity(author.WeaponPrefab, TransformUsageFlags.Dynamic),
+                stunDuration = author.StunDuration
             });
         }
     }
@@ -45,6 +75,13 @@ public struct PlayerData : IComponentData
     float3 velocity;
 }
 
+public struct HumanTag : IComponentData
+{
+
+}
+
+
+
 partial struct PlayerJob : IJobEntity
 {
     [ReadOnly] public float DeltaTime;
@@ -53,12 +90,25 @@ partial struct PlayerJob : IJobEntity
     [ReadOnly] public Vector3 Forward;
     [ReadOnly] public Vector3 Right;
 
+    [ReadOnly] public ComponentLookup<ZombieTag> zombieLookup;
+
+    [ReadOnly] public bool WeaponInput;
+
+
+    public float speed;
+    public float zombieSpeedMultiplier;
+
     public void Execute(Entity entity, in PlayerData playerData, ref LocalTransform transform)
     {
+        if (zombieLookup.HasComponent(entity))
+        {
+            speed *= zombieSpeedMultiplier;
+        }
         Forward.y = 0f;
         Forward.Normalize();
         float3 move_direction = Right * InputX + Forward * InputZ;
 
-        transform.Position += DeltaTime * move_direction * 100;
+        transform.Position += DeltaTime * move_direction * speed;
     }
 }
+

@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEditor.XR;
+using System.Linq;
 
 partial struct ZombieMoverSystem : ISystem
 {
@@ -29,10 +30,16 @@ partial struct ZombieMoverSystem : ISystem
 
         RefRW<GameManager> gameManager = SystemAPI.GetSingletonRW<GameManager>();
 
+        if(gameManager.ValueRO.GameManagerStates == GameManagerStates.GameOver)
+        {
+            UnityEngine.Debug.Log("Game Over");
+            return;
+        }
+
         //NativeList<float3> humanPositions = new NativeList<float3>(0, Allocator.TempJob);
         NativeList<HumanReference> humans = new NativeList<HumanReference>(0, Allocator.TempJob);
 
-        foreach (var (human, localTransform, entity) in SystemAPI.Query<RefRO<HumanMover>, RefRO<LocalTransform>>().WithAbsent<ZombieTag>().WithEntityAccess())
+        foreach (var (human, localTransform, entity) in SystemAPI.Query<RefRO<HumanTag>, RefRO<LocalTransform>>().WithAbsent<ZombieTag>().WithEntityAccess())
         {
             HumanReference reference = new HumanReference
             {
@@ -42,6 +49,11 @@ partial struct ZombieMoverSystem : ISystem
 
             humans.Add(reference);
 
+        }
+
+        if(humans.Length <= 0)
+        {            
+            gameManager.ValueRW.GameManagerStates = GameManagerStates.GameOver;
         }
 
         parity += 1;
@@ -64,7 +76,7 @@ partial struct ZombieMoverSystem : ISystem
         {
             DeltaTime = SystemAPI.Time.DeltaTime,
             humanReferences = humans,
-            target = Camera.main.transform.position,
+            //target = Camera.main.transform.position,
             spatialMapRead = spatialMapOld,
             spatialMapWrite = spatialMapNew.AsParallelWriter(),
             ECB = ECB.AsParallelWriter()
@@ -97,7 +109,8 @@ partial struct ZombieMoverJob : IJobEntity
 
     public void Execute(Entity entity, in ZombieMover mover, ref LocalTransform transform)
     {
-        //HumanReference humanTarget = GetClosestHuman(transform.Position, humanReferences);
+        HumanReference humanTarget = GetClosestHuman(transform.Position, humanReferences);
+        target = humanTarget.Position;
         float3 destination = new float3(target.x, 0f, target.z);
         float3 currentPosition = transform.Position;
 
@@ -133,12 +146,12 @@ partial struct ZombieMoverJob : IJobEntity
         transform.Position = nextPosition;
         spatialMapWrite.Add(key, nextPosition);
 
-        //if(math.distancesq(transform.Position, GetClosestHuman(transform.Position, humanReferences).Position) <= 0.5f)
-        //{
-        //    UnityEngine.Debug.Log("Zombie touched meeeee!");
-        //    touchedHuman = true;
-        //    ECB.AddComponent<ZombieTag>(entity.Index, humanTarget.Entity); 
-        //}
+        if(math.distancesq(transform.Position, GetClosestHuman(transform.Position, humanReferences).Position) <= 0.5f)
+        {
+           UnityEngine.Debug.Log("Zombie touched meeeee!");
+           //touchedHuman = true;
+           ECB.AddComponent<ZombieTag>(entity.Index, GetClosestHuman(transform.Position, humanReferences).Entity); 
+        }
 
     }
 
