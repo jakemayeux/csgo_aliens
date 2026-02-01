@@ -18,7 +18,7 @@ partial struct NetcodePlayerInputSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (playerInput, entity) in SystemAPI.Query<RefRW<NetcodePlayerInput>>()
+        foreach (var (playerInput, myValue, entity) in SystemAPI.Query<RefRW<NetcodePlayerInput>, RefRW<MyValue>>()
             .WithAll<GhostOwnerIsLocal>()
             .WithEntityAccess())
         {
@@ -43,6 +43,8 @@ partial struct NetcodePlayerInputSystem : ISystem
             {
                 inputVector.x = -1;
             }
+
+            
 
             playerInput.ValueRW.playerInput = inputVector;
         }
