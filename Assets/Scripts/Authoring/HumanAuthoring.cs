@@ -17,6 +17,8 @@ public class HumanAuthoring : MonoBehaviour
                 speed = authoring.Speed,
                 destination = authoring.Destination
             });
+
+            AddComponent(entity, new HumanTag{});
         }
     }
 }

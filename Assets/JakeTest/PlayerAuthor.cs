@@ -7,11 +7,13 @@ using UnityEngine;
 
 partial struct PlayerSystem : ISystem
 {
-    public void OnCreate(ref SystemState state) {}
+    public void OnCreate(ref SystemState state) { }
 
-    public void OnUpdate(ref SystemState state) {
+    public void OnUpdate(ref SystemState state)
+    {
         PlayerJob job = new PlayerJob
         {
+            zombieLookup = SystemAPI.GetComponentLookup<ZombieTag>(true),
             DeltaTime = SystemAPI.Time.DeltaTime,
             InputX = Input.GetAxis("Horizontal"),
             InputZ = Input.GetAxis("Vertical"),
@@ -23,10 +25,12 @@ partial struct PlayerSystem : ISystem
     }
 }
 
-public class PlayerAuthor : MonoBehaviour 
+public class PlayerAuthor : MonoBehaviour
 {
     public GameObject Prefab;
-    class Baker: Baker<PlayerAuthor>
+
+    public float Speed = 100f;
+    class Baker : Baker<PlayerAuthor>
     {
         public override void Bake(PlayerAuthor author)
         {
@@ -35,6 +39,8 @@ public class PlayerAuthor : MonoBehaviour
             {
                 Prefab = GetEntity(author.Prefab, TransformUsageFlags.Dynamic),
             });
+
+            AddComponent(entity, new HumanTag{});
         }
     }
 }
@@ -45,6 +51,11 @@ public struct PlayerData : IComponentData
     float3 velocity;
 }
 
+public struct HumanTag: IComponentData
+{
+    
+}
+
 partial struct PlayerJob : IJobEntity
 {
     [ReadOnly] public float DeltaTime;
@@ -53,8 +64,14 @@ partial struct PlayerJob : IJobEntity
     [ReadOnly] public Vector3 Forward;
     [ReadOnly] public Vector3 Right;
 
+    [ReadOnly] public ComponentLookup<ZombieTag> zombieLookup;
+
     public void Execute(Entity entity, in PlayerData playerData, ref LocalTransform transform)
     {
+        if (zombieLookup.HasComponent(entity))
+        {
+            UnityEngine.Debug.Log("I'm a zombie now");
+        }
         Forward.y = 0f;
         Forward.Normalize();
         float3 move_direction = Right * InputX + Forward * InputZ;

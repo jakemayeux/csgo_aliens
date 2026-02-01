@@ -13,7 +13,7 @@ public class ConfigAuthoring : MonoBehaviour
 
             AddComponent(entity, new GameManager
             {
-
+                
             });
         }
     }
