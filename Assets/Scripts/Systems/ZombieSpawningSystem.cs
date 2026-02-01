@@ -2,6 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.VisualScripting;
+using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
 
@@ -21,17 +22,13 @@ partial struct ZombieSpawningSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         RefRW<GameManager> gameManager = SystemAPI.GetSingletonRW<GameManager>();
-        /*if(gameManager.ValueRO.GameManagerStates != GameManagerStates.SpawningInitialZombies)
-        {
-            return;
-        }*/
 
         double CurrentTime = SystemAPI.Time.ElapsedTime;
 
 
         if (nextSpawn < CurrentTime)
         {
-            nextSpawn = CurrentTime + 1;
+            nextSpawn = CurrentTime + 0.4;
         }
         else
         {
@@ -41,7 +38,8 @@ partial struct ZombieSpawningSystem : ISystem
         foreach (var (spawner, entity) in SystemAPI.Query<RefRW<ZombieSpawner>>().WithEntityAccess())
         {
 
-            float3 nextPosition = random.NextFloat3() * 10 + spawner.ValueRO.SpawnZone.Center;
+            float3 nextPosition = (random.NextFloat3() * 10f) + spawner.ValueRO.SpawnZone.Center;
+            nextPosition.y = 0.0f;
 
             Entity zombie = state.EntityManager.Instantiate(spawner.ValueRO.Prefab);
 

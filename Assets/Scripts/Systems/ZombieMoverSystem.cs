@@ -7,34 +7,21 @@ using UnityEngine;
 
 partial struct ZombieMoverSystem : ISystem
 {
-
+    int parity;
+    public NativeParallelMultiHashMap<int, float3> spatialMap1;
+    public NativeParallelMultiHashMap<int, float3> spatialMap2;
 
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<GameManager>();
 
+        parity = 0;
+        spatialMap1 = new NativeParallelMultiHashMap<int, float3>(65536, Allocator.Persistent);
+        spatialMap2 = new NativeParallelMultiHashMap<int, float3>(65536, Allocator.Persistent);
     }
 
     public void OnUpdate(ref SystemState state)
     {
-        if (false)
-        {
-            foreach (var (mover, transform, entity) in SystemAPI.Query<RefRW<ZombieMover>, RefRW<LocalTransform>>().WithEntityAccess())
-            {
-
-                //Calculate next position 
-                float3 destination = mover.ValueRO.destination;
-                float3 currentPosition = transform.ValueRO.Position;
-
-                float3 trajectory = math.normalize(destination - currentPosition);
-
-                float3 nextPosition = currentPosition + trajectory * mover.ValueRO.speed * SystemAPI.Time.DeltaTime;
-
-                transform.ValueRW.Position = nextPosition;
-
-            }
-        }
-
         RefRW<GameManager> gameManager = SystemAPI.GetSingletonRW<GameManager>();
 
         NativeList<float3> humanPositions = new NativeList<float3>(0, Allocator.TempJob);
@@ -42,18 +29,33 @@ partial struct ZombieMoverSystem : ISystem
         foreach (var (human, localTransform, entity) in SystemAPI.Query<RefRO<HumanMover>, RefRO<LocalTransform>>().WithEntityAccess())
         {
             humanPositions.Add(localTransform.ValueRO.Position);
-
         }
+
+        parity += 1;
+        parity = parity % 2;
+
+        NativeParallelMultiHashMap<int, float3> spatialMapOld;
+        NativeParallelMultiHashMap<int, float3> spatialMapNew;
+
+        if (parity == 0) {
+            spatialMapOld = spatialMap1;
+            spatialMapNew = spatialMap2;
+        } else {
+            spatialMapOld = spatialMap2;
+            spatialMapNew = spatialMap1;
+        }
+
+        spatialMapNew.Clear();
 
         ZombieMoverJob moverJob = new ZombieMoverJob
         {
             DeltaTime = SystemAPI.Time.DeltaTime,
-            humanLocations = humanPositions
+            humanLocations = humanPositions,
+            target = Camera.main.transform.position,
+            spatialMapRead = spatialMapOld,
+            spatialMapWrite = spatialMapNew.AsParallelWriter()
         };
         state.Dependency = moverJob.ScheduleParallel(state.Dependency);
-
-
-
     }
 }
 
@@ -69,22 +71,50 @@ public struct DeathComponent : IComponentData
 partial struct ZombieMoverJob : IJobEntity
 {
     [ReadOnly] public float DeltaTime;
-
+ 
     [ReadOnly] public NativeList<float3> humanLocations;
+    [ReadOnly] public float3 target;
 
-
+    [ReadOnly]  public NativeParallelMultiHashMap<int, float3> spatialMapRead;
+    [WriteOnly] public NativeParallelMultiHashMap<int, float3>.ParallelWriter spatialMapWrite;
 
     public void Execute(Entity entity, in ZombieMover mover, ref LocalTransform transform)
     {
-        float3 destination = GetClosestLocation(transform.Position, humanLocations);
+        //float3 destination = GetClosestLocation(transform.Position, humanLocations);
+        float3 destination = new float3(target.x, 0f, target.z);
         float3 currentPosition = transform.Position;
 
         float3 trajectory = math.normalize(destination - currentPosition);
 
-        float3 nextPosition = currentPosition + trajectory * mover.speed * DeltaTime;
+        int2 cell = (int2)math.floor(transform.Position.xy);
+        int key = cell.x + cell.y * 128;
 
+        NativeParallelMultiHashMapIterator<int> it;
+        float3 pos;
+        float count = 1f;
+        for (int x = cell.x - 1; x <= cell.x + 1; x++) {
+            for (int y = cell.y - 1; y <= cell.y + 1; y++) {
+                key = x + y * 128;
+                if (spatialMapRead.TryGetFirstValue(key, out pos, out it))
+                {
+                    do
+                    {
+                        float3 direction = currentPosition - pos;
+                        if (math.lengthsq(direction) > 0.1 && math.lengthsq(direction) <= 1) {
+                            trajectory += math.normalize(direction);
+                            count ++;
+                        }
+                    }
+                    while (spatialMapRead.TryGetNextValue(out pos, ref it));
+                }
+            }
+        }
+
+        trajectory /= count;
+
+        float3 nextPosition = currentPosition + trajectory * mover.speed * DeltaTime * 3f;
         transform.Position = nextPosition;
-
+        spatialMapWrite.Add(key, nextPosition);
     }
 
     public float3 GetClosestLocation(float3 myPosition, NativeList<float3> locations)
