@@ -15,7 +15,7 @@ partial struct ProjectileSystem : ISystem
     {
 
         NativeList<ZombieReference> zombies = new NativeList<ZombieReference>(0, Allocator.TempJob);
-        foreach(var(zombie, localTransform, entity) in SystemAPI.Query<RefRO<ZombieTag>, RefRO<LocalTransform>>().WithEntityAccess())
+        foreach(var(zombie, localTransform, entity) in SystemAPI.Query<RefRO<ZombieTag>, RefRO<LocalTransform>>().WithAbsent<PlayerData>().WithEntityAccess())
         {
             ZombieReference zombieReference = new ZombieReference
             {
