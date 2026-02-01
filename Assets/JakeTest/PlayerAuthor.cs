@@ -18,7 +18,9 @@ partial struct PlayerSystem : ISystem
             InputX = Input.GetAxis("Horizontal"),
             InputZ = Input.GetAxis("Vertical"),
             Forward = Camera.main.transform.forward,
-            Right = Camera.main.transform.right
+            Right = Camera.main.transform.right,
+            speed = 50f,
+            zombieSpeedMultiplier = 1.5f
         };
 
         state.Dependency = job.ScheduleParallel(state.Dependency);
@@ -66,16 +68,19 @@ partial struct PlayerJob : IJobEntity
 
     [ReadOnly] public ComponentLookup<ZombieTag> zombieLookup;
 
+    public float speed;
+    public float zombieSpeedMultiplier;
+
     public void Execute(Entity entity, in PlayerData playerData, ref LocalTransform transform)
     {
         if (zombieLookup.HasComponent(entity))
         {
-            UnityEngine.Debug.Log("I'm a zombie now");
+            speed *= zombieSpeedMultiplier;
         }
         Forward.y = 0f;
         Forward.Normalize();
         float3 move_direction = Right * InputX + Forward * InputZ;
 
-        transform.Position += DeltaTime * move_direction * 100;
+        transform.Position += DeltaTime * move_direction * speed;
     }
 }

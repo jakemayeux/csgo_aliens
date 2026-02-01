@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEditor.XR;
+using System.Linq;
 
 partial struct ZombieMoverSystem : ISystem
 {
@@ -29,6 +30,12 @@ partial struct ZombieMoverSystem : ISystem
 
         RefRW<GameManager> gameManager = SystemAPI.GetSingletonRW<GameManager>();
 
+        if(gameManager.ValueRO.GameManagerStates == GameManagerStates.GameOver)
+        {
+            UnityEngine.Debug.Log("Game Over");
+            return;
+        }
+
         //NativeList<float3> humanPositions = new NativeList<float3>(0, Allocator.TempJob);
         NativeList<HumanReference> humans = new NativeList<HumanReference>(0, Allocator.TempJob);
 
@@ -42,6 +49,11 @@ partial struct ZombieMoverSystem : ISystem
 
             humans.Add(reference);
 
+        }
+
+        if(humans.Length <= 0)
+        {            
+            gameManager.ValueRW.GameManagerStates = GameManagerStates.GameOver;
         }
 
         parity += 1;
