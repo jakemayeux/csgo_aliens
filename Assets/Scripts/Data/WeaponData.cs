@@ -8,6 +8,12 @@ public struct WeaponData : IComponentData
     public Entity projectilePrefab;
     public float3 trajectory;
     public float stunDuration;
-
     public Entity weaponPrefab;
+}
+
+public struct ProjectileData: IComponentData
+{
+    public float speed;
+    public float stunDuration;
+    public float3 trajectory;
 }
