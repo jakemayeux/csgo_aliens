@@ -18,6 +18,12 @@ public struct ZombieTag: IComponentData
     //Empty, just to find zombies
 }
 
+public struct ZombieReference: IComponentData
+{
+    public Entity Entity;
+    public float3 Position;
+}
+
 public struct Stunned: IComponentData
 {
     
