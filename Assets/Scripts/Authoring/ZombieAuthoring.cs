@@ -19,7 +19,7 @@ public class ZombieAuthoring : MonoBehaviour
             AddComponent(entity, new ZombieTag
             {
                 
-            });
+            });       
         }
     }   
 }
